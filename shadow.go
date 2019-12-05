@@ -35,7 +35,7 @@ func updateOrFailFromExpr(info fileMetadata, exp ast.Expr, localScope map[string
 			fmt.Printf("%s:%d:%d:Shadowing variable `%s`\n", pos.Filename, pos.Line, pos.Column, expv.Name)
 			hasErrors = true
 		}
-		if expv.Name != "_" && expv.Name != "err" {
+		if expv.Name != "_"  {
 			localScope[expv.Name] = true
 		}
 	case *ast.StarExpr:
@@ -84,10 +84,12 @@ func updateOrFailFromStatement(info fileMetadata, st ast.Stmt, localScope map[st
 				}
 
 			}
-			for i, expr := range v.Lhs {
-				if i < len(typelist) && typelist[i] == "error" {
-					continue
-				}
+			for _, expr := range v.Lhs {
+				//if i < len(typelist) && typelist[i] == "error" {
+				//	continue
+				//}
+				fmt.Printf("%v", expr)
+
 				updateOrFailFromExpr(info, expr, localScope)
 			}
 		}
@@ -96,11 +98,11 @@ func updateOrFailFromStatement(info fileMetadata, st ast.Stmt, localScope map[st
 		if decl.Tok == token.VAR {
 			for _, spec := range decl.Specs {
 				s := spec.(*ast.ValueSpec)
-				if typ, ok := s.Type.(*ast.Ident); ok {
-					if typ.Name == "error" {
-						continue
-					}
-				}
+				//if typ, ok := s.Type.(*ast.Ident); ok {
+				//	if typ.Name == "error" {
+				//		continue
+				//	}
+				//}
 				for _, varname := range s.Names {
 					if localScope[varname.Name] {
 						pos := info.fset.Position(varname.Pos())
